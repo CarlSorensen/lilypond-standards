@@ -1,0 +1,146 @@
+/*
+  This file is part of LilyPond, the GNU music typesetter.
+
+  Copyright (C) 1999--2015 Han-Wen Nienhuys <hanwen@xs4all.nl>
+
+  LilyPond is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  LilyPond is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with LilyPond.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "scm-hash.hh"
+
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+
+/*
+  Return: number of objects.
+*/
+SCM
+copy_handle (void *closure, SCM handle)
+{
+  SCM tab = (SCM) closure;
+  scm_hashq_set_x (tab, scm_car (handle), scm_cdr (handle));
+  return tab;
+}
+
+static void
+copy_scm_hashes (SCM dest, SCM src)
+{
+  scm_internal_hash_for_each_handle ((scm_t_hash_handle_fn) &copy_handle,
+                                     dest, src);
+}
+
+Scheme_hash_table::Scheme_hash_table ()
+{
+  hash_tab_ = SCM_EOL;
+  smobify_self ();
+  hash_tab_ = scm_c_make_hash_table (119);
+}
+
+Scheme_hash_table::Scheme_hash_table (Scheme_hash_table const &src)
+  : Smob<Scheme_hash_table> ()
+{
+  hash_tab_ = SCM_EOL;
+  smobify_self ();
+  copy (src);
+}
+
+void
+Scheme_hash_table::copy (Scheme_hash_table const &src)
+{
+  if (&src == this)
+    return;
+
+  hash_tab_ = scm_c_make_hash_table (SCM_HASHTABLE_N_ITEMS (src.hash_tab_));
+  copy_scm_hashes (hash_tab_, src.hash_tab_);
+}
+
+Scheme_hash_table::~Scheme_hash_table ()
+{
+}
+
+SCM
+Scheme_hash_table::mark_smob ()
+{
+  scm_gc_mark (hash_tab_);
+  return SCM_EOL;
+}
+
+int
+Scheme_hash_table::print_smob (SCM p, scm_print_state *)
+{
+  scm_puts ("#<Scheme_hash_table  ", p);
+  scm_display (hash_tab_, p);
+  scm_puts ("> ", p);
+  return 1;
+}
+
+bool
+Scheme_hash_table::try_retrieve (SCM k, SCM *v)
+{
+
+  SCM handle = scm_hashq_get_handle (hash_tab_, k);
+  if (scm_is_pair (handle))
+    {
+      *v = scm_cdr (handle);
+      return true;
+    }
+  else
+    return false;
+}
+
+bool
+Scheme_hash_table::contains (SCM k) const
+{
+  return scm_is_pair (scm_hashq_get_handle (hash_tab_, k));
+}
+
+void
+Scheme_hash_table::set (SCM k, SCM v)
+{
+  assert (scm_is_symbol (k));
+  SCM handle = scm_hashq_create_handle_x (hash_tab_, k, SCM_UNDEFINED);
+  scm_set_cdr_x (handle, v);
+}
+
+SCM
+Scheme_hash_table::get (SCM k) const
+{
+  /* SCM_UNSPECIFIED will stick out like a sore thumb, hopefully.
+  */
+  return scm_hashq_ref (hash_tab_, k, SCM_UNSPECIFIED);
+}
+
+void
+Scheme_hash_table::remove (SCM k)
+{
+  scm_hashq_remove_x (hash_tab_, k);
+}
+
+static SCM
+collect_handles (void * /* closure */,
+                 SCM key,
+                 SCM value,
+                 SCM result)
+{
+  return scm_acons (key, value, result);
+}
+
+SCM
+Scheme_hash_table::to_alist () const
+{
+  return scm_internal_hash_fold ((scm_t_hash_fold_fn) &collect_handles,
+                                 NULL, SCM_EOL, hash_tab_);
+}

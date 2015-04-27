@@ -1,0 +1,161 @@
+/* -*- c++ -*-
+  This file is part of LilyPond, the GNU music typesetter.
+
+  Copyright (C) 2005--2015 Han-Wen Nienhuys <hanwen@xs4all.nl>
+
+  LilyPond is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  LilyPond is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with LilyPond.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef TRANSLATOR_ICC
+#define TRANSLATOR_ICC
+
+#include "listener.hh"
+#include "std-vector.hh"
+#include "translator.hh"
+
+/*
+  TODO: derive "foo-bar-interface" from Foo_bar classname.
+ */
+
+/**
+   A macro to automate administration of translators.
+*/
+#define ADD_THIS_TRANSLATOR(T)                                          \
+  SCM T::static_description_ = SCM_EOL;                                 \
+  static void _ ## T ## _adder ()                                       \
+  {                                                                     \
+    T *t = new T;                                                       \
+    T::static_description_ =                                            \
+      scm_permanent_object (t->static_translator_description ());       \
+    add_translator (t);                                                 \
+  }                                                                     \
+  SCM T::translator_description () const                                \
+  {                                                                     \
+    return static_description_;                                         \
+  }                                                                     \
+  ADD_GLOBAL_CTOR (_ ## T ## _adder); \
+  /* end define */
+
+#define DEFINE_TRANSLATOR_LISTENER_LIST(T) \
+  translator_listener_record *T::listener_list_;        \
+  /* end define */
+
+#define DEFINE_ACKNOWLEDGERS(classname) \
+  Drul_array< vector<Acknowledge_information> > classname::acknowledge_static_array_drul_;      \
+  Translator::Grob_info_callback                                        \
+  classname::static_get_acknowledger (SCM sym)                          \
+  {                                                                     \
+    return generic_get_acknowledger (sym, &acknowledge_static_array_drul_[START]);      \
+  }                                                                     \
+  Translator::Grob_info_callback                                        \
+  classname::static_get_end_acknowledger (SCM sym)                      \
+  {                                                                     \
+    return generic_get_acknowledger (sym, &acknowledge_static_array_drul_[STOP]);       \
+  }                                                                     \
+  /* end define */
+
+#define DEFINE_TRANSLATOR_DOC(classname, desc, grobs, read, write)              \
+  SCM                                                                   \
+  classname::static_translator_description () const                     \
+  {                                                                     \
+    return Translator::static_translator_description (grobs, desc, listener_list_, read, write); \
+  }
+
+#define ADD_TRANSLATOR(classname, desc, grobs, read, write)             \
+  IMPLEMENT_FETCH_PRECOMPUTABLE_METHODS (classname);                    \
+  ADD_THIS_TRANSLATOR (classname);                                      \
+  DEFINE_TRANSLATOR_DOC(classname, desc, grobs, read, write)            \
+  DEFINE_ACKNOWLEDGERS(classname) \
+  DEFINE_TRANSLATOR_LISTENER_LIST(classname) \
+
+#define IMPLEMENT_FETCH_PRECOMPUTABLE_METHODS(T)                        \
+  void                                                                  \
+  T::fetch_precomputable_methods (Translator::Callback ptrs[])		\
+  {                                                                     \
+    ptrs[START_TRANSLATION_TIMESTEP] =                                  \
+      (&T::start_translation_timestep					\
+       == &Translator::start_translation_timestep)			\
+      ? 0								\
+      : static_cast<Callback> (&T::start_translation_timestep);		\
+									\
+    ptrs[STOP_TRANSLATION_TIMESTEP] =					\
+      (& T::stop_translation_timestep == & Translator::stop_translation_timestep) \
+      ? 0								\
+      : static_cast<Callback> (&T::stop_translation_timestep);		\
+									\
+    ptrs[PROCESS_MUSIC] =						\
+      (&T::process_music == &Translator::process_music)			\
+      ? 0								\
+      : static_cast<Callback> (&T::process_music);			\
+									\
+    ptrs[PROCESS_ACKNOWLEDGED] =					\
+      (&T::process_acknowledged == &Translator::process_acknowledged)	\
+      ? 0								\
+      : static_cast<Callback> (&T::process_acknowledged);		\
+  }
+
+void add_acknowledger (Translator::Grob_info_callback ptr,
+                       char const *func_name,
+                       vector<Acknowledge_information> *ack_array);
+
+Translator::Grob_info_callback
+generic_get_acknowledger (SCM sym,
+                          vector<Acknowledge_information> const *ack_array);
+
+#define ADD_ACKNOWLEDGER(CLASS, NAME)                                   \
+  void CLASS ## NAME ## _ack_adder ()                                   \
+  {                                                                     \
+    add_acknowledger (static_cast<Translator::Grob_info_callback> (&CLASS::acknowledge_ ## NAME), #NAME, &CLASS::acknowledge_static_array_drul_[START]); \
+  }                                                                     \
+  ADD_SCM_INIT_FUNC (CLASS ## NAME ## _ack_adder_initclass, CLASS ## NAME ## _ack_adder);
+
+#define ADD_END_ACKNOWLEDGER(CLASS, NAME)                                       \
+  void CLASS ## NAME ## _end_ack_adder ()                                       \
+  {                                                                     \
+    add_acknowledger (static_cast<Translator::Grob_info_callback> (&CLASS::acknowledge_end_ ## NAME), #NAME, &CLASS::acknowledge_static_array_drul_[STOP]); \
+  }                                                                     \
+  ADD_SCM_INIT_FUNC (CLASS ## NAME ## _end_ack_adder_initclass, CLASS ## NAME ## _end_ack_adder);
+
+/*
+  Implement the method cl::listen_##m, and make it listen to stream
+  events of class m.
+ */
+#define IMPLEMENT_TRANSLATOR_LISTENER(cl, m)            \
+void                                                    \
+cl :: _internal_declare_ ## m ()                        \
+{                                                       \
+  static translator_listener_record r;                  \
+  add_translator_listener (&listener_list_, &r, _get_ ## m ## _listener, #m); \
+}                                                       \
+                                                        \
+ADD_SCM_INIT_FUNC (cl ## _declare_event_ ## m, cl::_internal_declare_ ## m);    \
+                                                        \
+Listener                                                \
+ cl :: _get_ ## m ## _listener (void *me, SCM unused)   \
+{                                                       \
+  cl *obj = (cl *) me;                                  \
+  (void) unused; \
+  return obj->GET_LISTENER (_listen_scm_ ## m);         \
+}                                                       \
+                                                        \
+IMPLEMENT_LISTENER (cl, _listen_scm_ ## m)              \
+void                                                    \
+cl::_listen_scm_ ## m (SCM sev)                         \
+{                                                       \
+  Stream_event *ev = Stream_event::unsmob (sev);         \
+  protect_event (sev);                                  \
+  listen_ ## m (ev);                                    \
+}
+
+#endif /* TRANSLATOR_ICC */

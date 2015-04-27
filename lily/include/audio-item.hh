@@ -1,0 +1,178 @@
+/*
+  This file is part of LilyPond, the GNU music typesetter.
+
+  Copyright (C) 1996--2015 Jan Nieuwenhuizen <janneke@gnu.org>
+
+  LilyPond is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  LilyPond is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with LilyPond.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef AUDIO_ITEM_HH
+#define AUDIO_ITEM_HH
+
+#include "audio-element.hh"
+#include "moment.hh"
+#include "pitch.hh"
+
+class Audio_item : public Audio_element
+{
+public:
+  Audio_column *audio_column_;
+  int channel_;
+
+  Audio_item ();
+  Audio_column *get_column () const;
+
+  virtual void render ();
+
+private:
+  Audio_item (Audio_item const &);
+  Audio_item &operator = (Audio_item const &);
+};
+
+class Audio_dynamic : public Audio_item
+{
+public:
+  Audio_dynamic ();
+
+  Real volume_;
+  bool silent_;
+};
+
+class Audio_span_dynamic : public Audio_element
+{
+public:
+  Direction grow_dir_;
+  vector<Audio_dynamic *> dynamics_;
+  Real min_volume_;
+  Real max_volume_;
+
+  virtual void render ();
+  void add_absolute (Audio_dynamic *);
+  Audio_span_dynamic (Real min_volume, Real max_volume);
+};
+
+class Audio_key : public Audio_item
+{
+public:
+  Audio_key (int acc, bool major);
+
+  int accidentals_;
+  bool major_;
+};
+
+class Audio_instrument : public Audio_item
+{
+public:
+  Audio_instrument (string instrument_string);
+
+  string str_;
+};
+
+class Audio_note : public Audio_item
+{
+public:
+  Audio_note (Pitch p, Moment m, bool tie_event, Pitch transposition, int velocity);
+
+  // with tieWaitForNote, there might be a skip between the tied notes!
+  void tie_to (Audio_note *, Moment skip = 0);
+  Audio_note *tie_head ();
+  virtual string to_string () const;
+
+  Pitch pitch_;
+  Moment length_mom_;
+  Pitch transposing_;
+  Audio_dynamic *dynamic_;
+  int extra_velocity_;
+
+  Audio_note *tied_;
+  bool tie_event_;
+};
+
+class Audio_piano_pedal : public Audio_item
+{
+public:
+  string type_string_;
+  Direction dir_;
+};
+
+class Audio_text : public Audio_item
+{
+public:
+  enum Type
+  {
+    TEXT = 1, COPYRIGHT, TRACK_NAME, INSTRUMENT_NAME, LYRIC,
+    MARKER, CUE_POINT
+  };
+
+  Audio_text (Audio_text::Type type, const string &text_string);
+
+  Type type_;
+  string text_string_;
+};
+
+class Audio_tempo : public Audio_item
+{
+public:
+  Audio_tempo (int per_minute_4);
+
+  int per_minute_4_;
+};
+
+class Audio_time_signature : public Audio_item
+{
+public:
+  Audio_time_signature (int beats, int one_beat);
+
+  int beats_;
+  int one_beat_;
+};
+
+class Audio_control_function_value_change : public Audio_item
+{
+public:
+  // Supported control functions.
+  enum Control
+  {
+    BALANCE = 0, PAN_POSITION, EXPRESSION, REVERB_LEVEL, CHORUS_LEVEL,
+    // pseudo value for representing the size of the enum; must be kept last
+    NUM_CONTROLS
+  };
+
+  Audio_control_function_value_change (Control control, Real value);
+
+  // Information about a context property corresponding to a control function
+  // (name, the corresponding enumeration value, and the allowed range for the
+  // value of the context property).
+  struct Context_property
+  {
+    const char *name_;
+    Control control_;
+    Real range_min_;
+    Real range_max_;
+  };
+
+  // Mapping from supported control functions to the corresponding context
+  // properties.
+  static const Context_property context_properties_[];
+
+  Control control_;
+  Real value_;
+};
+
+int moment_to_ticks (Moment);
+Real moment_to_real (Moment);
+Moment remap_grace_duration (Moment);
+
+#endif // AUDIO_ITEM_HH
+

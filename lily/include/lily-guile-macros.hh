@@ -1,0 +1,240 @@
+/*
+  This file is part of LilyPond, the GNU music typesetter.
+
+  Copyright (C) 2005--2015 Han-Wen Nienhuys <hanwen@xs4all.nl>
+
+  LilyPond is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  LilyPond is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with LilyPond.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef LILY_GUILE_MACROS_HH
+#define LILY_GUILE_MACROS_HH
+
+#include "config.hh"
+
+#if GUILEV2
+// if Guile's internal representation switches to utf8, this should be
+// changed accordingly for efficiency's sake.  This is used for
+// strings known to be in ASCII entirely, including any string
+// constants in the C code.
+#define scm_from_ascii_string scm_from_latin1_string
+#define scm_from_ascii_stringn scm_from_latin1_stringn
+#define scm_from_ascii_symbol scm_from_latin1_symbol
+#else
+#define scm_from_ascii_string scm_from_locale_string
+#define scm_from_ascii_stringn scm_from_locale_stringn
+#define scm_from_ascii_symbol scm_from_locale_symbol
+#define scm_from_latin1_string scm_from_locale_string
+#define scm_from_latin1_stringn scm_from_locale_stringn
+#define scm_from_utf8_string scm_from_locale_string
+#define scm_from_utf8_symbol scm_from_locale_symbol
+#define scm_to_utf8_string scm_to_locale_string
+#endif
+
+#ifndef SMOB_FREE_RETURN_VAL
+#define SMOB_FREE_RETURN_VAL(CL) 0
+#endif
+
+#ifndef SCM_PACK
+#define SCM_PACK(x) ((SCM) x)
+#endif
+
+#ifndef SCM_UNPACK
+#define SCM_UNPACK(x) (x)
+#endif
+
+/* For backward compatability with Guile 1.8 */
+#if !HAVE_GUILE_SUBR_TYPE
+typedef SCM (*scm_t_subr) (GUILE_ELLIPSIS);
+#endif
+
+/* Unreliable with gcc-2.x
+   FIXME: should add check for x86 as well?  */
+#define CACHE_SYMBOLS
+
+#ifdef CACHE_SYMBOLS
+
+/* this lets us "overload" macros such as get_property to take
+   symbols as well as strings */
+inline SCM
+scm_or_str2symbol (char const *c) { return scm_from_utf8_symbol (c); }
+
+inline SCM
+scm_or_str2symbol (SCM s)
+{
+  assert (scm_is_symbol (s));
+  return s;
+}
+
+/* Using this trick we cache the value of scm_from_locale_symbol ("fooo") where
+   "fooo" is a constant string. This is done at the cost of one static
+   variable per ly_symbol2scm() use, and one boolean evaluation for
+   every call.
+ */
+#define ly_symbol2scm(x)                                                \
+  ({                                                                    \
+    static SCM cached;                                                  \
+    /* We store this one locally, since G++ -O2 fucks up else */        \
+    SCM value = cached;                                                 \
+    if (__builtin_constant_p ((x)))                                     \
+      {                                                                 \
+        if (!SCM_UNPACK (cached))                                       \
+          value = cached = scm_gc_protect_object (scm_or_str2symbol (x)); \
+      }                                                                 \
+    else                                                                \
+      value = scm_or_str2symbol (x);                                    \
+    value;                                                              \
+  })
+#else
+inline SCM ly_symbol2scm (char const *x) { return scm_from_utf8_symbol ((x)); }
+#endif
+
+/*
+  we don't have to protect the result; it's already part of the
+  exports list of the module.
+*/
+
+#define ly_lily_module_constant(x)                                      \
+  ({                                                                    \
+    static SCM cached;                                                  \
+    /* We store this one locally, since G++ -O2 fucks up else */        \
+    SCM value = cached;                                                 \
+    if (__builtin_constant_p ((x)))                                     \
+      {                                                                 \
+        if (!SCM_UNPACK (cached))                                       \
+          value = cached =                                              \
+            scm_variable_ref (scm_c_module_lookup (global_lily_module, (x))); \
+      }                                                                 \
+    else                                                                \
+      value =                                                           \
+        scm_variable_ref (scm_c_module_lookup (global_lily_module, (x))); \
+    value;                                                              \
+  })
+
+/*
+  Adds the NAME as a Scheme function, and a variable to store the SCM
+  version of the function in the static variable NAME_proc
+*/
+#define DECLARE_SCHEME_CALLBACK(NAME, ARGS)     \
+  static SCM NAME ARGS;                         \
+  static SCM NAME ## _proc
+
+string mangle_cxx_identifier (string);
+
+void ly_add_type_predicate (void *ptr, const string &name);
+string predicate_to_typename (void *ptr);
+
+/*
+  Make TYPE::FUNC available as a Scheme function.
+*/
+#define MAKE_SCHEME_CALLBACK_WITH_OPTARGS(TYPE, FUNC, ARGCOUNT, OPTIONAL_COUNT, DOC) \
+  SCM TYPE ::FUNC ## _proc;                                             \
+  void                                                                  \
+  TYPE ## _ ## FUNC ## _init_functions ()                               \
+  {                                                                     \
+    string cxx = string (#TYPE) + "::" + string (#FUNC); \
+    string id = mangle_cxx_identifier (cxx); \
+    TYPE ::FUNC ## _proc = scm_c_define_gsubr (id.c_str(),                      \
+                                               (ARGCOUNT-OPTIONAL_COUNT), OPTIONAL_COUNT, 0,    \
+                                               (scm_t_subr) TYPE::FUNC); \
+    ly_add_function_documentation (TYPE :: FUNC ## _proc, id.c_str(), "", \
+                                   DOC);                                \
+    scm_c_export (id.c_str (), NULL);                                   \
+  }                                                                     \
+                                                                        \
+  ADD_SCM_INIT_FUNC (TYPE ## _ ## FUNC ## _callback,                    \
+                     TYPE ## _ ## FUNC ## _init_functions);
+
+#define MAKE_DOCUMENTED_SCHEME_CALLBACK(TYPE, FUNC, ARGCOUNT, DOC)              \
+  MAKE_SCHEME_CALLBACK_WITH_OPTARGS(TYPE, FUNC, ARGCOUNT, 0, DOC);
+
+#define MAKE_SCHEME_CALLBACK(TYPE, FUNC, ARGCOUNT)                      \
+  MAKE_SCHEME_CALLBACK_WITH_OPTARGS(TYPE,FUNC,ARGCOUNT, 0, "");
+
+void ly_add_function_documentation (SCM proc, const string &fname, const string &varlist, const string &doc);
+void ly_check_name (const string &cxx, const string &fname);
+
+#define ADD_SCM_INIT_FUNC(name, func)           \
+  class name ## _scm_initter                    \
+  {                                             \
+  public:                                       \
+    name ## _scm_initter ()                     \
+    {                                           \
+      add_scm_init_func (func);                 \
+    }                                           \
+  }                                             \
+    _ ## name ## _scm_initter;
+
+/* end define */
+
+#define LY_DEFINE_WITHOUT_DECL(INITPREFIX, FNAME, PRIMNAME, REQ, OPT, VAR, \
+                               ARGLIST, DOCSTRING)                      \
+  SCM FNAME ## _proc;                                                   \
+  void                                                                  \
+  INITPREFIX ## init ()                                                 \
+  {                                                                     \
+    FNAME ## _proc = scm_c_define_gsubr (PRIMNAME, REQ, OPT, VAR,       \
+                                         (scm_t_subr) FNAME); \
+    ly_check_name (#FNAME, PRIMNAME);\
+    ly_add_function_documentation (FNAME ## _proc, PRIMNAME, #ARGLIST,  \
+                                   DOCSTRING);                          \
+    scm_c_export (PRIMNAME, NULL);                                      \
+  }                                                                     \
+  ADD_SCM_INIT_FUNC (INITPREFIX ## init_unique_prefix, INITPREFIX ## init); \
+  SCM                                                                   \
+  FNAME ARGLIST
+
+#define LY_DEFINE(FNAME, PRIMNAME, REQ, OPT, VAR, ARGLIST, DOCSTRING)   \
+  SCM FNAME ARGLIST;                                                    \
+  LY_DEFINE_WITHOUT_DECL (FNAME, FNAME, PRIMNAME, REQ, OPT, VAR, ARGLIST, \
+                          DOCSTRING)
+
+#define LY_DEFINE_MEMBER_FUNCTION(CLASS, FNAME, PRIMNAME, REQ, OPT, VAR, \
+                                  ARGLIST, DOCSTRING)                   \
+  SCM FNAME ARGLIST;                                                    \
+  LY_DEFINE_WITHOUT_DECL (CLASS ## FNAME, CLASS::FNAME, PRIMNAME, REQ, OPT, \
+                          VAR, ARGLIST, DOCSTRING)
+
+#define get_property(x) internal_get_property (ly_symbol2scm (x))
+#define get_pure_property(x,y,z) \
+  internal_get_pure_property (ly_symbol2scm (x), y, z)
+#define get_maybe_pure_property(w,x,y,z) \
+  internal_get_maybe_pure_property (ly_symbol2scm (w), x, y, z)
+#define get_property_data(x) internal_get_property_data (ly_symbol2scm (x))
+#define get_object(x) internal_get_object (ly_symbol2scm (x))
+#define set_object(x, y) internal_set_object (ly_symbol2scm (x), y)
+#define del_property(x) internal_del_property (ly_symbol2scm (x))
+
+#ifndef NDEBUG
+/*
+  TODO: include modification callback support here, perhaps
+  through intermediate Grob::instrumented_set_property( .. __LINE__ ).
+ */
+#define set_property(x, y) instrumented_set_property (ly_symbol2scm (x), y, __FILE__, __LINE__, __FUNCTION__)
+#else
+#define set_property(x, y) internal_set_property (ly_symbol2scm (x), y)
+#endif
+
+#define LY_ASSERT_TYPE(pred, var, number)                                       \
+  {                                                                     \
+    if (!pred (var)) \
+      {                                                                 \
+        scm_wrong_type_arg_msg(mangle_cxx_identifier (__FUNCTION__).c_str(), \
+                               number, var, \
+                               predicate_to_typename ((void*) &pred).c_str()); \
+      }                                                                 \
+  }
+
+#define LY_ASSERT_SMOB(klass, var, number) LY_ASSERT_TYPE(klass::is_smob, var, number)
+
+#endif /* LILY_GUILE_MACROS_HH */

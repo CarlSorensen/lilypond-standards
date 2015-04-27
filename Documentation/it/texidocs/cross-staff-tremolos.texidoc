@@ -1,0 +1,9 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Dato che @code{\\repeat tremolo} si aspetta esattamente due argomenti musicali per
+i tremoli di accordi, la nota o l'accordo che cambiano rigo in un tremolo che
+attraversa i righi devono essere posti tra parentesi graffe insieme al
+comando @code{\\change Staff}.
+
+"
+  doctitleit = "Tremoli attraverso i righi"

@@ -1,0 +1,12 @@
+\input texinfo @c -*- coding: utf-8; mode: texinfo; -*-
+@setfilename texinfo-musicxml-file.info
+@settitle MusicXML inside texinfo
+
+@node Top
+@top MusicXML in texinfo
+
+A MusicXML file included in texinfo without any options:
+@musicxmlfile{include.xml}
+
+
+@bye

@@ -1,0 +1,10 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Questo piccolo modello presenta una semplice linea melodica con un testo. Copialo
+e incollalo, aggiungi le note e le parole. Questo esempio disabilita la
+disposizione automatica delle travature, come è consuetudine per le parti
+vocali. Per usare la disposizione automatica delle travature, cambia o
+commenta la relativa linea di codice.
+
+"
+  doctitleit = "Modello di rigo singolo con note e testo"

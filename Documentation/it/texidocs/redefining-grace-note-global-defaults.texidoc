@@ -1,0 +1,11 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Le impostazioni globali predefinite degli abbellimenti sono salvate negli
+identificatori @code{startGraceMusic}, @code{stopGraceMusic},
+@code{startAcciaccaturaMusic}, @code{stopAcciaccaturaMusic},
+@code{startAppoggiaturaMusic} e @code{stopAppoggiaturaMusic}, che
+sono definiti nel file @code{ly/grace-init.ly}.  Ridefinendoli si
+possono ottenere effetti diversi.
+
+"
+  doctitleit = "Ridefinire le impostazioni predefinite globali degli abbellimenti"

@@ -1,0 +1,8 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Le regole relative alle estremità delle travature definite nel contesto @code{Score}
+si applicano a tutti i righi, ma possono essere modificate anche ai livelli
+@code{Staff} e @code{Voice}:
+
+"
+  doctitleit = "Estremità delle travature nel contesto Score"

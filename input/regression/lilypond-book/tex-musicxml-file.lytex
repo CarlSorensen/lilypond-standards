@@ -1,0 +1,5 @@
+\documentclass{article}
+\begin{document}
+Including a MusicXML file without options:
+\musicxmlfile{include.xml}
+\end{document}

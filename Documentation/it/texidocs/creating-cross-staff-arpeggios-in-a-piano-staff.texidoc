@@ -1,0 +1,7 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+In un rigo per pianoforte (@code{PianoStaff}), è possibile far sì che un
+arpeggio attraversi i righi impostando la proprietà @code{PianoStaff.connectArpeggios}.
+
+"
+  doctitleit = "Creare degli arpeggi che attraversano il rigo del pianoforte"

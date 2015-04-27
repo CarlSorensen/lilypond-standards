@@ -1,0 +1,8 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+LilyPond può modificare la  direzione del gambo della nota centrale di un
+rigo in modo che segua la melodia: occorre aggiungere l'incisore
+@code{Melody_engraver} al contesto Voice e sovrascrivere la
+proprietà @code{neutral-direction} di Stem.
+"
+  doctitleit = "Cambiare automaticamente la direzione del gambo della nota centrale in base alla melodia"

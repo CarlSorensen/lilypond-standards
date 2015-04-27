@@ -1,0 +1,11 @@
+%% Translation of GIT committish: c5f6541667b71037c4965b482a8161628c7cc485
+  texidocfr = "
+Si l'on peut positionner verticalement un silence simple en le
+rattachant à une note, il n'en va pas de même pour un silence
+multimesure.  Néanmoins, et uniquement dans le cadre de musique
+polyphonique, les silences multimesures sont positionnés différemment
+selon qu'ils appartiennent à une voix au numéro pair ou impair.  Le
+positionnement des silences multimesures peut se contrôler ainsi :
+
+"
+  doctitlefr = "Positionnement des silences multimesures"

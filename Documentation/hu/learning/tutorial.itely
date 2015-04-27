@@ -1,0 +1,660 @@
+@c -*- coding: utf-8; mode: texinfo; documentlanguage: hu -*-
+
+@ignore
+    Translation of GIT committish: ef7ee24e2aee81dd97888b4533ab7eae038ce666
+
+    When revising a translation, copy the HEAD committish of the
+    version that you are working on.  For details, see the Contributors'
+    Guide, node Updating translation committishes..
+@end ignore
+
+@c \version "2.16.0"
+
+@node Első lecke
+@chapter Első lecke
+@translationof Tutorial
+
+Tankönyvünk első leckéje bemutatja a LilyPond nyelvét, és elmagyarázza,
+hogyan kell nyomtatható kottát előállítani.
+
+@menu
+* Fájlok fordítása::
+* Bemeneti fájlok írása::
+* Hogyan olvassuk a dokumentációt?::
+@end menu
+
+@node Fájlok fordítása
+@section Fájlok fordítása
+@translationof Compiling a file
+
+@menu
+* Zene bevitele::
+* Mac OS X::
+* Windows::
+* Parancssor::
+@end menu
+
+@node Zene bevitele
+@subsection Zene bevitele
+@translationof Entering input
+
+@cindex fordítás
+@cindex első példa
+@cindex kis- és nagybetűk különbsége
+
+A LilyPond bemeneti fájljai egyszerű szöveges állományok.
+Egy kotta létrehozásához egy bemeneti fájlban (másnéven forrásfájlban) kell
+azt szöveges formában leírni.
+@qq{Fordítás} a neve annak a folyamatnak, melynek során egy LilyPond
+formátumú forrásfájlból egy nyomtatható kotta és (szabadon választhatóan)
+egy meghallgatható MIDI fájl áll elő.
+
+Első példánk megmutatja, hogy néz ki egy egyszerű bemenet. A LilyPond
+forrásfájlba ezt írva:
+
+@example
+@{
+  c' e' g' e'
+@}
+@end example
+
+@noindent
+az alábbi eredményt kapjuk:
+
+@c  in this case we don't want verbatim
+@lilypond[quote]
+{
+  c' e' g' e'
+}
+@end lilypond
+
+@warning{A LilyPondban a hangok és a dalszöveg köré mindig
+@strong{@{ kapcsos zárójeleket @}} kell írni.
+A kapcsos zárójeleket legtöbbször szóközzel vesszük körül, hacsak
+a sor elején vagy végén nem állnak, hogy környezetükkel ne folyjanak
+egybe, így kétértelműséget okozván. A tankönyv példáiban olykor a
+rövidség kedvéért elhagyjuk a kapcsos zárójeleket, de a forrásfájlokban
+nem szabad elfelejteni kitenni őket! A @ref{Hogyan olvassuk a dokumentációt?}
+c. fejezetben olvasható több információ a tankönyv példáiról és megjelenítésük
+módjáról.}
+
+Továbbá a LilyPond bemenete @strong{érzékeny a kis- és nagybetűk különbségére}:
+@w{@code{@{ c d e @}}} érvényes bemenet; @w{@code{@{ C D E @}}} hibát
+eredményez.
+
+@smallspace
+
+@subheading A kimenet megtekintése
+
+@cindex PDF fájl
+@cindex megtekintés
+@cindex szövegszerkesztők
+@cindex Mac OS X, a LilyPond futtatása
+@cindex Windows, a LilyPond futtatása
+@cindex Linux, a LilyPond futtatása
+@cindex Unix, a LilyPond futtatása
+
+Ez a szakasz arról szól, hogy milyen parancsokat kell futtatni
+a kotta előállításához és a kimenet megtekintéséhez a felhasználó operációs
+rendszerétől függően.
+
+Bizonyos szövegszerkesztőkbe beépíthető LilyPond támogatás, ami hatékonyabb
+szerkesztést tesz lehetővé; erről a @rprogram{Text editor support} c.
+fejezet ír.
+
+@warning{Amikor a LilyPond első alkalommal fut, egy-két percig várni kell,
+amíg megvizsgálja a rendszer betűtípusait. Ezután természetesen sokkal
+gyorsabban fog futni!}
+
+@node Mac OS X
+@subsection Mac OS X
+@translationof MacOS X
+
+Ha elindítjuk a @command{LilyPond.app} alkalmazást, egy példaállományt látunk
+megnyitva. Mentsük el (pl. @file{test.ly} néven az Asztalra), majd a
+@w{@qq{Compile > Typeset File}} (@q{Fordítás > Kotta szedése}) menüpont segítségével fordítsuk le.
+Ezután az eredményül kapott PDF fájl a képernyőn látható.
+
+A következő parancsok, melyekre szükség lehet, a @qq{New} (@q{Új}) és az @qq{Open}
+(@q{Megnyitás}) a @qq{File} (@q{Fájl}) menüben. A szerkesztés alatt levő fájlt a szedés előtt
+mindig el kell menteni. Ha a feldolgozás során bármilyen hiba történt, a
+naplóablakban láthatjuk a hibák leírását.
+
+@node Windows
+@subsection Windows
+@translationof Windows
+
+Windows alatt az Asztalon levő LilyPond ikonra duplán kattintva indíthatjuk el
+a LilyPondot, mely először egy példafájlt nyit meg egy egyszerű
+szövegszerkesztőben. Mentsük el (pl. @file{test.ly} néven az Asztalra),
+majd kattintsunk rá duplán a lefordításához (az ikonja egy hangjegyre
+hasonlít). Pár másodperc múlva létrejön egy @file{test.pdf} nevű fájl az
+Asztalon. Ha erre duplán kattintunk, megtekinthetjük a nyomtatható kottát.
+A @file{test.ly} fordításának másik módja, hogy egérrel ráhúzzuk a LilyPond
+parancsikonjára.
+
+Egy létező @file{.ly} fájl szerkesztéséhez kattintsunk rá jobb gombbal, és
+válasszuk az @qq{Edit source} (@q{Forrás szerkesztése}) menüpontot. Új kotta
+írásához vagy a szerkesztőt futtassuk a fent leírt módon, majd válasszuk ki a
+@qq{File > New} (@q{Fájl > Új}) parancsot, vagy jobb gombbal
+kattintsunk az Asztalra, válasszuk az @q{Új > Szöveges dokumentum}
+menüpontot, nevezzük át a fájlt a kívánt névre, és változtassuk meg a
+kiterjesztését @file{.ly}-re. Ezután ugyanúgy szerkeszthetjük és
+feldolgozhatjuk, ahogy eddig is tettük.
+
+Ha duplán kattintunk egy @code{.ly} fájlra, nem csak egy PDF-et kapunk, hanem
+egy @code{.log} kiterjesztésű naplófájlt is, amely a LilyPond futásáról
+tartalmaz információkat. Hiba esetén ajánlatos megvizsgálni.
+
+@node Parancssor
+@subsection Parancssor
+@translationof Command-line
+
+Hozzunk létre egy fájlt @file{test.ly} néven, és írjuk bele a következőket:
+
+@example
+@{
+  c' e' g' e'
+@}
+@end example
+
+A @file{test.ly} fájl feldolgozásához adjuk ki az alábbi parancsot:
+
+@example
+lilypond test.ly
+@end example
+
+@noindent
+Ekkor az alábbi kimenethez hasonlót láthatunk:
+
+@example
+lilypond test.ly
+GNU LilyPond @version{}
+Processing `test.ly'
+Parsing...
+Interpreting music...
+Preprocessing graphical objects...
+Finding the ideal number of pages...
+Fitting music on 1 page...
+Drawing systems...
+Layout output to `test.ps'...
+Converting to `test.pdf'...
+@end example
+
+@node Bemeneti fájlok írása
+@section Bemeneti fájlok írása
+@translationof How to write input files
+
+@menu
+* Egyszerű kottázás::
+* A bemeneti fájlok jellemzői::
+@end menu
+
+@node Egyszerű kottázás
+@subsection Egyszerű kottázás
+@translationof Simple notation
+
+@cindex egyszerű lejegyzés
+@cindex lejegyzés, egyszerű
+
+A LilyPond bizonyos elemeket automatikusan hozzáad a kottához. A következő
+példában csak négy hangmagasságot adunk meg, de a LilyPond kirakja a kulcsot
+és az ütemmutatót, valamint a hangok hosszúságát alapértelmezetten negyednek
+veszi.
+
+@lilypond[verbatim,quote]
+{
+  c' e' g' e'
+}
+@end lilypond
+
+@noindent
+Természetesen minden megváltoztatható, de a legtöbb esetben az alapbeállítás
+megfelelő.
+
+@subheading Hangmagasság
+
+@cindex hangmagasság
+@cindex relatív mód
+@cindex aposztróf
+@cindex vessző
+@cindex módosítójelek és relatív mód
+
+@funindex \relative
+@funindex relative
+@funindex '
+@funindex ,
+
+Fogalomtár: @rglos{pitch}, @rglos{interval},
+@rglos{scale}, @rglos{middle C}, @rglos{octave},
+@rglos{accidental}.
+
+A hangok beírásának legegyszerűbb módja a @code{\relative} mód.
+Ebben a módban minden hang automatikusan abba az oktávba kerül,
+melyben az előző hanghoz a legközelebb áll, vagyis legfeljebb
+kvárt távolságra. Ennek szemléltetésére gépeljünk be egy zenei alapformulát,
+egy @notation{skálát}, melyben minden hang szekund távolságra van az
+előzőtől. (Figyelem: mivel angolul a h hang neve b, ezért a LilyPond forrásban
+is alapesetben b-t kell írni h helyett!)
+
+@c KEEP LY
+@lilypond[verbatim,quote]
+% megadjuk, hogy az első viszonyítási hang az egyvonalas c legyen
+\relative c' {
+  c d e f
+  g a b c
+}
+@end lilypond
+
+Itt a relatív mód első viszonyítási hangja az @notation{egyvonalas c}. Minden
+hang az előzőhöz a lehető legközelebb helyezkedik el: az első @code{c} az
+egyvonalas c-hez legközelebb eső c hangot jelenti, vagyis az egyvonalas c-t.
+A második, d hang ehhez a hanghoz esik legközelebb, vagyis ugyanúgy az
+egyvonalas oktávba kerül.
+Legfeljebb kvárt nagyságú hangközöket tartalmazó dallamok tápláhatók be így a
+legegyszerűbben.
+
+@lilypond[verbatim,quote]
+\relative c' {
+  d f a g
+  c b f d
+}
+@end lilypond
+
+@noindent
+Természetesen nem szükséges, hogy a relatív mód első viszonyítási hangja
+megegyezzen a tényleges első hanggal, ahogy az előző példában is láttuk, ahol
+az első hang -- a @code{d} -- az egyvonalas c-hez legközelebb eső hang,
+az egyvonalas d.
+
+A @code{@w{\relative c'}} parancsban megadott első viszonyítási hanghoz
+@code{'} vagy @code{,} karaktereket hozzáadva vagy elvéve
+változtatható a kezdőoktáv:
+
+@c KEEP LY
+@lilypond[verbatim,quote]
+% kétvonalas oktáv
+\relative c'' {
+  e c a c
+}
+@end lilypond
+
+A relatív mód kezdetben bonyolultnak tűnhet, de valójában a legtöbb
+dallamot így lehet legkönnyebben bevinni. Nézzük, hogyan néz ki a relatív
+hangmagasság-számítás a gyakorlatban. A h hangról egy kvárton belül felfelé
+a c, d és e hangok helyezkednek el, míg lefelé az a, g és f hangok. Tehát ha
+egy h-t követő hang c, d vagy e, akkor a h fölé, míg ha a, g vagy f, akkor a
+h alá kerül.
+
+@c KEEP LY
+@lilypond[verbatim,quote]
+\relative c'' {
+  b c  % felfelé szekund, lefelé szeptim, így: felső c
+  b d  % felfelé terc, lefelé szext, így: felső d
+  b e  % felfelé kvárt, lefelé kvint, így: felső e
+  b a  % felfelé szeptim, lefelé szekund, így: alsó a
+  b g  % felfelé szext, lefelé terc, így: alsó g
+  b f  % felfelé kvint, lefelé kvárt, így: alsó f
+}
+@end lilypond
+
+Pontosan ugyanez marad a működés, ha bármelyik hang előtt kereszt vagy bé áll.
+A @notation{módosítójelek} a relatív magasságszámítás során @strong{egyáltalán
+nem számítanak}. A számítás során csak a vonalrendszerben elfoglalt pozíciónak
+(azaz a diatonikus magasságnak) van szerepe.
+
+Kvártnál nagyobb hangközugrást úgy érhetünk el, hogy @code{'} vagy @code{,}
+karaktereket helyezünk a hang után. Az @code{'} egy @notation{oktáv}nyi
+emelkedést, a @code{,} egy oktávnyi süllyedést jelent.
+
+@lilypond[verbatim,quote]
+\relative c'' {
+  a a, c' f,
+  g g'' a,, f'
+}
+@end lilypond
+
+@noindent
+Amennyi karaktert használunk, annyi oktáv különbséget érhetünk el, pl.
+@code{''} vagy @code{,,} két oktávnyi emelést, ill. süllyesztést jelent --
+de vigyázzunk, soha ne használjunk idézőjelet (@code{"}) két aposztróf
+(@code{''}) helyett! Ez ugyanaz a mechanizmus, amivel a relatív mód első
+viszonyítási hangját módosíthatjuk.
+
+
+@subheading Ritmusérték
+
+@cindex hanghosszúság
+@cindex hosszúság
+@cindex ritmus
+@cindex egészkotta
+@cindex félkotta
+@cindex negyedkotta
+@cindex pontozás
+
+Fogalomtár: @rglos{beam}, @rglos{duration},
+@rglos{whole note}, @rglos{half note}, @rglos{quarter note},
+@rglos{dotted note}.
+
+A hangok @notation{ritmusértékét} a hangmagasság után írt számmal
+határozhatjuk meg. @code{1} jelenti az egészkottát, @code{2} a
+félkottát, @code{4} a negyedkottát és így tovább. A
+@notation{gerendázást} automatikusan elvégzi a LilyPond.
+
+Ha nincs megadva a hosszúság, az előző hang hossza marad érvényben.
+Az első hang alapértelmezetten negyed hosszúságú.
+
+@lilypond[verbatim,quote]
+\relative c'' {
+  a1
+  a2 a4 a8 a
+  a16 a a a a32 a a a a64 a a a a a a a a2
+}
+@end lilypond
+
+A @notation{pontozott hangok} után annyi pontot (@code{.}) kell írni,
+ahányszoros a pontozás. A pontozott hangok ritmusértékét mindig meg kell
+adni számmal.
+
+@lilypond[verbatim,quote]
+\relative c'' {
+  a a a4. a8
+  a8. a16 a a8. a8 a4.
+}
+@end lilypond
+
+
+@subheading Szünet
+
+@cindex szünet
+
+Fogalomtár: @rglos{rest}.
+
+A @notation{szünetek} megadása hasonlóképpen történik, mint a hangoké,
+csak a hangmagasság megjelölése helyett @code{r}@tie{} betűt kell írni:
+
+@lilypond[verbatim,quote]
+\relative c'' {
+  a r r2
+  r8 a r4 r4. r8
+}
+@end lilypond
+
+
+@subheading Ütemmutató
+
+@cindex ütemmutató
+
+@funindex \time
+@funindex time
+
+Fogalomtár: @rglos{time signature}.
+
+Az @notation{ütemmutató} beállítására a @code{\time} parancs szolgál:
+
+@lilypond[verbatim,quote]
+\relative c'' {
+  \time 3/4
+  a4 a a
+  \time 6/8
+  a4. a
+  \time 4/4
+  a4 a a a
+}
+@end lilypond
+
+
+@subheading Kulcs
+
+@cindex kulcs
+@cindex violinkulcs
+@cindex altkulcs
+@cindex tenorkulcs
+@cindex basszuskulcs
+
+@funindex \clef
+@funindex clef
+
+Fogalomtár: @rglos{clef}.
+
+A @notation{kulcs} beállítása a @code{\clef} paranccsal lehetséges:
+
+@lilypond[verbatim,quote]
+\relative c' {
+  \clef treble
+  c1
+  \clef alto
+  c1
+  \clef tenor
+  c1
+  \clef bass
+  c1
+}
+@end lilypond
+
+
+@subheading Mindez együtt
+
+Alább látható egy rövid példa, mely az eddig tanult elemeket mutatja be:
+
+@lilypond[verbatim,quote]
+\relative c, {
+  \time 3/4
+  \clef bass
+  c2 e8 c' g'2.
+  f4 e d c4 c, r4
+}
+@end lilypond
+
+
+@seealso
+Referencia: @ruser{Writing pitches},
+@ruser{Writing rhythms}, @ruser{Writing rests},
+@ruser{Time signature}, @ruser{Clef}.
+
+
+@node A bemeneti fájlok jellemzői
+@subsection A bemeneti fájlok jellemzői
+@translationof Working on input files
+
+@cindex kapcsos zárójelek
+@cindex megjegyzés
+@cindex egysoros megjegyzés
+@cindex többsoros megjegyzés
+@cindex kis- és nagybetűk különbsége
+@cindex kifejezések
+
+@funindex { ... }
+@funindex %
+@funindex %@{ ... %@}
+
+A LilyPond nyelve sok tekintetben hasonlít bizonyos programnyelvekhez.
+Érzékeny a kis- és nagybetűk különbségére, az üres helyek (szóközök, újsorok,
+tabulátorok stb.) pedig nem számítanak. Ún. kifejezéseket lehet alkotni
+kapcsos zárójelek @{ @} segítségével, megjegyzéseket pedig @code{%} után
+vagy @w{@code{%@{ ... %@}}} közé lehet írni.
+
+Ha esetleg nem lennének világosak a fenti mondatok, sebaj! Magyarázatuk
+részletesen a következő:
+
+@itemize
+
+@item
+@strong{Érzékeny a kis- és nagybetűk különbségére}:
+nem mindegy, hogy kisbetűket vagy nagybetűket használunk
+(pl. @w{@code{a, b, s, t}} nem ugyanaz, mint @w{@code{A, B, S, T}}).
+A hangneveket mindig kisbetűvel kell írni: @w{@code{@{ c d e @}}}
+helyes, @w{@code{@{ C D E @}}} hibás bemenet.
+
+@item
+@strong{Az üres helyek nem számítanak}:
+mindegy, hogy hova hány szóköz, tabulátor vagy újsor kerül.
+@w{@code{@{ c d e @}}} ugyanazt jelenti, mint
+@w{@code{@{ c @tie{} @tie{} @tie{} d e @}}} vagy:
+
+@example
+@{ c                        d
+                   e   @}
+@end example
+
+@noindent
+Természetesen ez így nehezen olvasható. Érdemes a blokkokat beljebb kezdeni
+egy tabulátorral vagy két szóközzel:
+
+@example
+@{
+  c d e
+@}
+@end example
+
+@item
+@strong{Kifejezések}:
+a LilyPond bemenete @strong{@{ kapcsos zárójelek @}} között álló @emph{zenei
+kifejezésekből} épül fel (ezekről később lesz szó), akárcsak a zárójelek
+@code{()} közé zárt matematikai kifejezések. A kapcsos zárójelek köré javasolt
+szóközt tenni, hacsak nem a sor elején vagy végén szerepelnek.
+
+Egy @code{\} karakterrel kezdődő LilyPond parancs az azt követő kapcsos
+zárójelpár tartalmával együtt ugyancsak egy zenei kifejezésnek számít (mint
+például a @w{@code{\relative @{ @}}}).
+
+@cindex megjegyzések
+@cindex egysoros megjegyzés
+@cindex többsoros megjegyzés
+@item
+@strong{Megjegyzések}:
+a megjegyzések az emberi olvasó számára írt útmutatók; a LilyPond ezeket
+figyelmen kívül hagyja, így nem jelennek meg a kimenetben. Kétfajta megjegyzés
+van. A százalékjel @code{%} egy olyan megjegyzést kezd, mely a sor végéig tart.
+Egy egysoros megjegyzés mindig az @emph{utána levő} sorral kapcsolatos.
+
+@example
+a4 a a a
+% most jön a két h hang
+b2 b
+@end example
+
+A többsoros megjegyzés (megjegyzésblokk) több sort is közrefoghat.
+A @code{%@{} és @code{%@}} jelek között minden megjegyzésnek számít.
+Figyelem, a megjegyzésblokkok nem ágyazhatóak egymásba! Ez azt
+jelenti, hogy nem lehet egy megjegyzésblokkot egy másikon belülre tenni,
+mert az első @code{%@}} jelnél véget ér @emph{mindkét} megjegyzésblokk.
+A következő részlet a megjegyzések használatára mutat példát:
+
+@example
+% Ez itt a "Hull a pelyhes fehér hó" dallama
+  c4 c g' g a a g2
+
+%@{
+  Ez a sor és az alatta levők nem számítanak bele a kimenetbe,
+  mert megjegyzésblokkban szerepelnek.
+
+  f f e e d d c2
+%@}
+@end example
+
+@end itemize
+
+
+@node Hogyan olvassuk a dokumentációt?
+@section Hogyan olvassuk a dokumentációt?
+@translationof How to read the manuals
+
+@menu
+* Kapcsos zárójelek elhagyása::
+* Kattintható példák::
+* A dokumentáció áttekintése::
+@end menu
+
+@node Kapcsos zárójelek elhagyása
+@subsection Kapcsos zárójelek elhagyása
+@translationof Omitted material
+
+@cindex hogyan olvassuk a kézikönyvet
+@cindex kézikönyv
+@cindex példák
+@cindex sablonok
+@cindex tippek
+
+A LilyPond bemenete vagy @{ @} jelek között, vagy pedig egy
+@code{@w{\relative c'' @{ ... @}}} blokkban kell, hogy álljon, ahogy azt a
+@ref{A bemeneti fájlok jellemzői} c. fejezetben láttuk.
+A tankönyv további részében a legtöbb példában ezt elhagyjuk. A példák
+kipróbálásához a kimenet kimásolható és beilleszthető, de mindig köré
+@strong{kell} rakni a @code{@w{\relative c'' @{ @}}} blokkot, ha nem szerepel
+benne:
+
+@example
+\relative c'' @{
+  ...a példa ide kerül...
+@}
+@end example
+
+Miért hagytuk el a kapcsos zárójeleket? A legtöbb példa a kézikönyvben
+beszúrható más, hosszabb darabokba. Ezeknél a példáknál nem éri meg
+külön megadni a @code{@w{\relative c'' @{ @}}} blokkot --
+esetleg belekerülnének egy nagyobb @code{\relative} blokkba, ami nem javasolt!
+Ha minden példa körül @code{@w{\relative c'' @{ @}}} szerepelne,
+nem lenne egyszerű az ilyen példákat kimásolni és beilleszteni egy hosszabb
+műbe. Mivel a legtöbb felhasználó a neki kellő kódrészleteket egyszerűen
+kimásolja a kézikönyvből, úgy döntöttünk, hogy leegyszerűsítjük a példákat.
+
+
+@node Kattintható példák
+@subsection Kattintható példák
+@translationof Clickable examples
+
+A legtöbb ember úgy tanul bele egy program használatába, hogy a gyakorlatban
+próbálgatja azt, és játszadozik vele. Ez a LilyPonddal is lehetséges.
+A kézikönyv HTML változatában bármelyik képre kattintva megtekinthető a pontos
+bemenet, amelyből a LilyPond a képet generálta. Ez az alábbi példán
+kipróbálható:
+
+@c no verbatim here
+@c KEEP LY
+@lilypond[quote]
+\relative c'' {
+  c-\markup { \bold \huge { Ide kell kattintani! } }
+}
+@end lilypond
+
+A @qq{ly snippet} kezdetű szakasz kimásolásával és beillesztésével már
+rendelkezésre áll egy kiindulópont a kísérletezéshez. A kép egy az egyben
+előáll (ugyanakkora méretben), ha a @qq{Start cut-&-pastable section}
+résztől kezdve a fájl végéig kimásoljuk a szöveget.
+
+@node A dokumentáció áttekintése
+@subsection A dokumentáció áttekintése
+@translationof Overview of manuals
+
+A LilyPondhoz nagyon sok dokumentáció áll rendelkezésre.
+Az új felhasználóknak emiatt gyakran nem világos, hogy mely részeket
+kell elolvasniuk, és olykor alapvető fontosságú részeket hagynak ki.
+
+@warning{A dokumentáció fontos részeit erősen ajánlott elolvasni, különben
+a későbbi részek megértése jóval nehezebb lesz.}
+
+@itemize
+
+@item
+@strong{@emph{Legelőször is}}: a tankönyvből az @ref{Első lecke}, majd az
+@ref{Elemi kottaírás} fejezeteket kell elolvasni. Amennyiben egy zenei
+fogalom jelentése nem világos, a @rglosnamed{Top, Zenei fogalomtárban} lehet
+megkeresni.
+
+@item
+@strong{Egy teljes darab írása előtt}: a tankönyv @ref{Alapfogalmak} c.
+fejezetét javasolt elolvasni. Ezután a
+@rusernamed{Top, Kottaírás kézikönyvében} lehet az előforduló kottaelemek
+beviteli módját megnézni.
+
+@item
+@strong{Az alapértelmezett kimenet megváltoztatása előtt}:
+@ref{A kimenet finomhangolása} olvasandó el.
+
+@item
+@strong{Egy nagy mű bevitele előtt}: a program használatának kézikönyvéből a
+@rprogramnamed{Suggestions for writing files, Tanácsok LilyPond bemeneti fájlok írásához}
+c. fejezetet érdemes elolvasni.
+
+@end itemize

@@ -1,0 +1,146 @@
+# -*-Makefile-*-
+
+MISSING_OPTIONAL = @OPTIONAL@
+MISSING_REQUIRED = @REQUIRED@
+
+# @configure_input@
+
+package-depth = @package_depth@
+
+################################################################
+## FLAGS
+################################################################
+
+FREETYPE2_CFLAGS = @FREETYPE2_CFLAGS@
+GUILE_CFLAGS = @GUILE_CFLAGS@
+PANGO_FT2_CFLAGS = @PANGO_FT2_CFLAGS@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
+
+CONFIG_CPPFLAGS = @CPPFLAGS@
+CONFIG_DEFINES = @DEFINES@
+
+CONFIG_CFLAGS = @CFLAGS@ $(GUILE_CFLAGS) $(FREETYPE2_CFLAGS) $(PANGO_FT2_CFLAGS)
+CONFIG_CXXFLAGS = @CXXFLAGS@ $(GUILE_CFLAGS) $(FREETYPE2_CFLAGS) $(PANGO_FT2_CFLAGS)
+
+FONTCONFIG_LIBS = @FONTCONFIG_LIBS@
+GUILE_LIBS = @GUILE_LDFLAGS@
+FREETYPE2_LIBS = @FREETYPE2_LIBS@
+PANGO_FT2_LIBS = @PANGO_FT2_LIBS@
+PYTHON_LIBS = @PYTHON_LDFLAGS@
+CXXABI_LIBS = @CXXABI_LIBS@
+
+CONFIG_LIBS = @LIBS@ @EXTRA_LIBS@ $(GUILE_LIBS) $(PANGO_FT2_LIBS) $(FONTCONFIG_LIBS) $(FREETYPE2_LIBS)
+CONFIG_LDFLAGS = @LDFLAGS@
+
+PACKAGE = @PACKAGE@
+package = @package@
+PACKAGE_NAME = @PACKAGE_NAME@
+
+HOST_ARCH=@HOST_ARCH@
+
+################################################################
+## FILESYSTEM
+################################################################
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+configure-builddir = @ugh_ugh_autoconf250_builddir@
+configure-srcdir = @srcdir@
+
+bindir = @bindir@
+build_lilypond_datadir = @build_package_datadir@
+build_lilypond_libdir = @build_package_libdir@
+datarootdir = @datarootdir@
+datadir = @datadir@
+docdir = $(datadir)/doc
+elispdir = $(datadir)/emacs/site-lisp
+includedir = @includedir@
+infodir = @infodir@
+libdir = @libdir@
+localedir = @localedir@
+mandir = @mandir@
+omfdir = $(datadir)/omf
+program_prefix = @program_prefix@
+program_suffix = @program_suffix@
+sharedstatedir = @sharedstatedir@
+stepmake = @stepmake@
+
+package_datadir = $(datadir)/$(package)
+package_infodir = $(infodir)/$(package)
+package_libdir = $(libdir)/$(package)
+package_docdir = $(docdir)/$(package)
+package_omfdir = $(omfdir)/$(package)
+
+local_package_datadir = $(package_datadir)/$(TOPLEVEL_VERSION)
+local_package_docdir = $(package_docdir)/$(TOPLEVEL_VERSION)
+local_package_libdir = $(package_libdir)/$(TOPLEVEL_VERSION)
+local_package_omfdir = $(package_omfdir)/$(TOPLEVEL_VERSION)
+
+local_lilypond_datadir = $(local_package_datadir)
+local_lilypond_docdir = $(local_package_docdir)
+local_lilypond_libdir = $(local_package_libdir)
+local_lilypond_omfdir = $(local_package_omfdir)
+
+lilypond_datadir = $(local_package_datadir)
+lilypond_libdir = $(local_package_libdir)
+lilypond_docdir = $(package_docdir)
+lilypond_omfdir = $(local_package_omfdir)
+
+webdir = $(lilypond_docdir)/html
+vimdir = $(lilypond_datadir)/vim
+
+
+NCSB_SOURCE_FILES = @NCSB_SOURCE_FILES@
+NCSB_DIR = @NCSB_DIR@
+HELV_SOURCE_FILES = @HELV_SOURCE_FILES@
+COUR_SOURCE_FILES = @COUR_SOURCE_FILES@
+
+################################################################
+## PROGRAMS
+################################################################
+
+AR = @AR@
+BASH = @BASH@
+BISON = @BISON@
+CC = @CC@
+CONFIGSUFFIX = @CONFIGSUFFIX@
+CROSS = @cross_compiling@
+CXX = @CXX@
+DBLATEX = @DBLATEX@
+DEFINES = @DEFS@ @DEFINES@
+DEFS = @DEFS@
+DOCUMENTATION = @DOCUMENTATION@
+FIND = @FIND@
+FCLIST = @FCLIST@
+FLEX = @FLEX@
+FLEXLEXER_FILE = @FLEXLEXER_FILE@
+FONTFORGE = @FONTFORGE@
+GROFF = @GROFF@
+GUILE = @GUILE@
+GUILE_CFLAGS = @GUILE_CFLAGS@
+GUILE_CONFIG = @GUILE_CONFIG@
+GUILE_LDFLAGS = @GUILE_LDFLAGS@
+LD = @LD@
+LINK_GXX_STATICALLY = @LINK_GXX_STATICALLY@
+LN = @LN@
+LN_S = @LN_S@
+MAKEINFO_PROGRAM = @MAKEINFO@
+TEXI2HTML_PROGRAM = @TEXI2HTML@
+METAFONT = @METAFONT@ -progname=mf
+MFMODE = @MFMODE@
+MSGFMT = @MSGFMT@
+PAPERSIZE=a4
+PATHSEP = @PATHSEP@
+PDFLATEX = @PDFLATEX@
+PERL = @PERL@
+PLATFORM_WINDOWS = @PLATFORM_WINDOWS@
+PYTHON = @PYTHON@ -tt
+TARGET_PYTHON = @PYTHON@ -tt
+RANLIB = @RANLIB@
+ROOTSEP = @ROOTSEP@
+SHELL = @SHELL@
+TAR = @TAR@
+WINDRES = @WINDRES@
+YACC = @YACC@
+ZIP = @ZIP@

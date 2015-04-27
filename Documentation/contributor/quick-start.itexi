@@ -1,0 +1,565 @@
+@c -*- coding: utf-8; mode: texinfo; -*-
+
+@node Quick start
+@chapter Quick start
+
+Want to submit a patch for LilyPond?  Great!  Never created a patch
+before? Never compiled software before? No problem!  This chapter is
+for you and will help you do this as quickly and easily as possible.
+
+@menu
+* LilyDev::
+* lily-git::
+* Compiling with LilyDev::
+* Now start work!::
+@end menu
+
+@node LilyDev
+@section LilyDev
+
+There is a disk image of a @q{remix} of Debian GNU/Linux available for
+download which includes all the necessary software and tools to compile
+both LilyPond and the documentation.  Called the
+@qq{Debian LilyPond Developer Remix}, but known simply as @qq{LilyDev}
+for short.  Although it is not possible to compile LilyPond on Windows
+and extremely difficult on MacOS, LilyDev can be installed and run
+inside a @q{virtual machine} on any of these operating systems without
+disturbing your main operating system.  The LilyDev disk image can also
+be burnt to a DVD or copied to a USB stick and installed like any
+other GNU/Linux distribution.
+
+Most virtualization software can be used but we recommend VirtualBox as
+it is available for all major operating systems and is easy to install
+& configure.
+
+If you are not familiar with GNU/Linux, it may be beneficial to read a
+couple of @qq{introduction to Linux} web pages.
+
+For those interested, the LilyDev remix is currently based on a 32bit
+version of Debian 7 (Wheezy).  The image is generated using Debian
+@uref{http://live.debian.net/, live-build} and the configuration
+files are hosted on GitHub:
+
+@smallexample
+@uref{https://github.com/fedelibre/LilyDev}
+@end smallexample
+
+@warning{Apart from installing and configuring LilyDev in VirtualBox,
+the rest of the chapter assumes that you are comfortable using the
+command-line.  While this chapter is intended for users who may have
+never created a patch or compiled software before, experienced
+developers (who prefer to use their own development environment) may
+still find it instructive to skim over this section.}
+
+@menu
+* Where to get LilyDev::
+* Installing LilyDev in VirtualBox::
+* Configuring LilyDev in VirtualBox::
+@end menu
+
+
+@node Where to get LilyDev
+@unnumberedsubsec Where to get LilyDev
+
+Download the LilyDev image file (approximately 850 MB) from here:
+
+@smallexample
+@uref{http://www.et.byu.edu/~sorensen/lilydev-3.0.iso}
+@end smallexample
+
+Some advanced users might want this file too:
+@smallexample
+@uref{http://www.et.byu.edu/~sorensen/lilydev-3.0.iso.md5}
+@end smallexample
+(If you don't recognize what this file is, then you don't need it.)
+
+
+
+@node Installing LilyDev in VirtualBox
+@unnumberedsubsec Installing LilyDev in VirtualBox
+
+This section discusses how to install and use LilyDev with VirtualBox.
+
+@warning{If you already know how to install a virtual machine using a
+disc image inside VirtualBox (or your own virtualization software) then
+you can skip this section and go straight to @ref{lily-git}.}
+
+@enumerate
+@item
+Download Virtualbox from here:
+
+@example
+@uref{http://@/www.virtualbox.org/@/wiki/@/Downloads}
+@end example
+
+@warning{In virtualization terminology, the operating system where
+Virtualbox is installed is known as the @strong{host}.  LilyDev
+will be installed @q{inside} Virtualbox as a @strong{guest}.}
+
+@item
+Start the VirtualBox software and click @q{New} to create a new
+@qq{virtual machine}.
+
+The @q{New Virtual Machine Wizard} will walk you through setting up your
+guest virtual machine.  Choose an appropriate name for your LilyDev
+installation and select the @q{Linux} operating system.  When selecting
+the @q{version} choose @q{Debian (32 bit)} (don't use the @q{64 bit}
+option).  If you do not have that specific option choose @q{Linux 2.6}
+(again do not choose any option that has 64 bit next to it).
+
+@item
+Select the amount of RAM you will allow the LilyDev guest to use from
+your host operating system when it is running.  If possible, use at
+least 700 MB of RAM; the more RAM you can spare from your host the
+better, although LilyDev will currently use no more than 4 GB (4096 MB)
+even if you are able to assign more.
+
+@item
+For your @q{Virtual Hard Disk}, leave the @q{Create new hard disk}
+option checked, use the default @q{VDI} and
+@qq{Dynamically allocated} options for the virtual hard drive.  A
+complete compile of everything (code, docs, regression tests) can reach
+10 GB so size your virtual disk and its location accordingly.
+
+@item
+Verify the summary details and click @q{Create}, when you are satisfied.
+Your new guest will be displayed in the Virtualbox window.
+@warning{The image contains a 686-pae kernel, so you must enable PAE
+in the virtual machine settings: click on @clicksequence{System @click{} Processor}
+and select @q{Extended features: Enable PAE/NX}.}
+
+@item
+Click the @q{Start} button and the @q{First Run Wizard} will prompt you for
+the installation media.  Click the browse icon and locate the LilyDev
+disk image and click through the wizard to start the installation
+process.
+
+@item
+When the LilyDev disk image boots, you should choose the @q{Install} or
+the @q{Graphical install} menu item to begin the installation of
+LilyDev on your virtual hard disk.  The installer will walk you
+through the complete installation process.
+
+@warning{If the root password is left blank when prompted, the configured user
+account will be be given root privileges automatically.  This means that only
+one password needs to be remembered.}
+
+@item
+At the @qq{Partition disks} stage, do not be afraid to select
+@qq{Guided - use entire disk}, since this refers to your
+@strong{@emph{virtual disk}}, not your machine's actual hard
+disk.
+
+@item
+Click through the rest of the wizard, filling in any appropriate details
+when asked and wait for the install to complete.
+This will take about 10 minutes in a recent computer.
+
+@item
+When the installation is completed, just click on Continue (you
+don't have to remove any media since you installed from a file
+on your host filesystem).  The installer will reboot the virtual
+machine: LilyDev is now installed and running!
+
+
+@end enumerate
+
+@knownissues
+Not all hardware is supported in all virtualization tools.  In
+particular, some contributors have reported problems with USB network
+adapters.  If you have problems with network connection (for example
+Internet connection in the host system is lost when you launch virtual
+system), try installing and running LilyDev with your computer's
+built-in network adapter used to connect to the network.  Refer to the
+help documentation that comes with your virtualization software.
+
+
+@node Configuring LilyDev in VirtualBox
+@unnumberedsubsec Configuring LilyDev in VirtualBox
+
+VirtualBox has extra @q{guest additions} which although are not
+necessary to use LilyDev or compile Lilypond, do provide some additional
+features to your Virtual Machine to make it easier to work with.  Such
+as being able to dynamically resize the LilyDev window, allow seamless
+interaction with your mouse pointer on both the host and guest and let
+you copy/paste between your host and guest if needed.
+
+@enumerate
+
+@item
+Select the @q{Devices} menu from the virtual machine window and choose
+@q{Install Guest Additions...}.  This will automount a CD which will
+prompt you to autorun it.  Click OK and follow the instructions.  It is
+recommended to reboot the guest when the installation is complete.
+
+Other virtualization software will also have their own @q{guest}
+additions, follow the normal procedures for your virtualization software
+with LilyDev as the client.
+
+@item
+Restart LilyDev to complete the installation of the guest additions.
+
+@advanced{If you do any kernel upgrades, you may need to reinstall
+the additional software.  Just follow the step above again and reboot
+when the reinstallation is complete.}
+
+@end enumerate
+
+@noindent
+Other items that may be helpful:
+
+@itemize
+
+@item
+In the settings for the virtual machine, set the network to
+Bridged mode to allow you to access shared folders when using Windows
+hosts.
+
+@item
+Set up any additional features, such as @q{Shared Folders} between
+your main operating system and LilyDev.  This is distinct from the
+networked share folders in Windows.  Consult the external
+documentation for this.
+
+Some longtime contributors have reported that @q{shared folders}
+are rarely useful and not worth the fuss, particularly since files
+can be shared over a network instead.
+
+@item
+Pasting into a terminal is done with @code{Ctrl+Shift+v}.
+
+@item
+Right-click allows you to edit a file with the text editor (default
+is Leafpad).
+
+@item
+One particular change from Windows and MacOS X is that most
+software should be installed with your @qq{package manager}; this
+vastly simplifies the process of installing and configuring
+software.  If you use LilyDev 3.0 and you need a graphical
+package manager type this command in a terminal:
+
+@c synaptic will be added in the next version of LilyDev
+
+@example
+sudo apt-get install synaptic
+@end example
+
+Go to the menu at the bottom left and click on
+@clicksequence{Preferences @click{} Synaptic Package Manager}.
+
+@end itemize
+
+
+@node lily-git
+@section lily-git
+
+The @q{LilyPond Contributor's Git Interface} (otherwise known as
+@command{lily-git.tcl}) is a simple-to-use GUI to help you download and
+update the LilyPond source code as well as an aid to making software
+patches.
+
+@menu
+* Where to get lily-git::
+* Configuring lily-git and downloading the source code::
+* How to use lily-git::
+@end menu
+
+@node Where to get lily-git
+@unnumberedsubsec Where to get lily-git
+
+Depending on your development environment, lily-git may already be
+installed on your computer.
+
+@itemize
+@item
+If you are using LilyDev (see @ref{LilyDev}) then lily-git should be
+already installed and ready to run.  This is not the case for the
+current version (3.0), but you can easily turn it on by adding this
+line in ~/.bashrc:
+
+@example
+# add lily-git to the PATH
+PATH=$LILYPOND_GIT/scripts/auxiliar:"$@{PATH@}"
+@end example
+
+@item
+For those not using LilyDev then lily-git can be obtained by downloading
+the software directly. See @ref{Manually installing lily-git.tcl}.
+
+@item
+Finally, lily-git is always part of the LilyPond source code and is
+located in @file{$LILYPOND_GIT/scripts/auxillar/lily-git.tcl}.
+
+@end itemize
+
+
+@node Configuring lily-git and downloading the source code
+@unnumberedsubsec Configuring lily-git and downloading the source code
+
+@warning{The rest of this manual assumes that you are using the
+command-line within a terminal.}
+
+@enumerate
+@item
+Type (or copy&paste) into the Terminal:
+
+@example
+lily-git.tcl
+@end example
+
+@noindent
+You will be prompted to enter your name and your email address.  This
+information is used only to identify and label any patches you create.
+This information can be edited if required later.  See
+@ref{Configuring Git}.  Click on the @emph{Submit} button to update
+lily-git with this information.
+
+@item
+Click on the @qq{Get source} button.
+
+A directory called @file{$LILYPOND_GIT} is now created within
+your home directory and the complete source code will start to be
+downloaded into it.
+
+@warning{Be patient! The complete source is around 150@tie{}Mb.}
+
+@noindent
+When the source code has been downloaded, the @qq{Command output} window
+in lily-git will update and display @qq{Done} on the very last line.
+The button label will change to say @qq{Update source}.
+
+@warning{Some contributors have reported that occasionally nothing
+happens at this step at all.  If this occurs, then try again in a few
+minutes -- it could be an intermittant network problem.  If the
+problem persists, please ask for help.}
+
+@item
+Close the lily-git GUI and navigate to the @file{$LILYPOND_GIT}
+directory to view and edit the source files.
+
+@end enumerate
+
+@noindent
+If this is the first time you have compiled LilyPond then please go
+to @ref{Compiling with LilyDev} before reading on.
+
+
+@node How to use lily-git
+@unnumberedsubsec How to use lily-git
+
+@warning{Throughout the rest of this manual, most command-line
+input should be entered from @file{~/lilypond-git/}.  This is
+known as the @emph{top source directory} and is often referred to as
+@var{$LILYPOND_GIT}.}
+
+@warning{Only work on one set of changes at once.  Do not start
+work on any new changes until your first set has been accepted.}
+
+@subsubheading 1. Update source
+
+At the beginning of each session of lilypond work, you should
+click the @qq{Update source} button to get the latest changes to
+the source code.
+
+@warning{In some rare and unfortunate circumstances, this will
+result in a @emph{merge conflict}.  If this occurs, follow the
+instructions for @qq{Abort changes}, below.  Your work will not be
+lost.}
+
+
+@subsubheading 2a. New local commit
+
+A single commit typically represents one logical set of related
+changes (such as a bug-fix), and may incorporate changes to
+multiple files at the same time.
+
+When you're finished making the changes for a commit, click the
+@qq{New local commit} button.  This will open the @qq{Git Commit
+Message} window.  The message header is required, and the message
+body is optional.
+
+After entering a commit message, click @qq{OK} to finalize the
+commit.
+
+@advanced{for more information regarding commits and commit
+messages, see @ref{Commits and patches}.}
+
+
+@subsubheading 2b. Amend previous commit
+
+You can go back and make changes to the most recent commit with
+the @qq{Amend previous commit} button.  This is useful if a
+mistake is found after you have clicked the @qq{New local commit}
+button.
+
+To amend the most recent commit, re-edit the source files as
+needed and then click the @qq{Amend previous commit} button.  The
+earlier version of the commit is not saved, but is replaced by the
+new one.
+
+@warning{This does not update the patch @strong{files}; if you
+have a patch file from an earlier version of the commit, you will
+need to make another patch set when using this feature.  The old
+patch file will not be saved, but will be replaced by the new one
+after you click on @qq{Make patch set}.}
+
+
+@subsubheading 3. Make patch set
+
+Before making a patch set from any commits, you should click the
+@qq{Update source} button to make sure the commits are based on
+the most recent remote snapshot.
+
+When you click the @qq{Make patch set} button,
+@command{lily-git.tcl} will produce patch files for any new
+commits, saving them to the current directory.  The command output
+will display the name of the new patch files near the end of the
+output:
+
+@example
+0001-CG-add-lily-git-instructions.patch
+Done.
+@end example
+
+Send patch files to the appropriate place:
+
+@itemize
+@item
+If you have a mentor, send it to them via email.
+
+@item
+Translators should send patches to
+@email{translations@@lilynet.net}.
+
+@item
+More experienced contributors should upload the patch for
+web-based review.  This requires additional software and use of
+the command-line; see @ref{Uploading a patch for review}.
+
+@item
+If you have trouble uploading the patch for review,
+ask for help on @email{lilypond-devel@@gnu.org}.
+
+@end itemize
+
+
+@subsubheading The @qq{Abort changes -- Reset to origin} button
+
+@warning{Only use this if your local commit history gets
+hopelessly confused!}
+
+The button labeled @qq{Abort changes -- Reset to origin} will copy
+all changed files to a subdirectory of @file{$LILYPOND_GIT} named
+@file{aborted_edits/}, and will reset the repository to the
+current state of the remote repository (at @code{git.sv.gnu.org}).
+
+
+
+@node Compiling with LilyDev
+@section Compiling with LilyDev
+
+LilyDev is our @q{remix} of Debian which contains all the
+necessary dependencies to do lilypond development; for more
+information, see @ref{LilyDev}.
+
+@subsubheading Preparing the build
+
+To prepare the build directory, enter (or copy&paste) the below
+text.  This should take less than a minute.
+
+@c we heavily recommend the out-of-tree build; do not change this!
+
+@example
+cd $LILYPOND_GIT
+sh autogen.sh --noconfigure
+mkdir -p build/
+cd build/
+../configure
+@end example
+
+@subsubheading Building @code{lilypond}
+
+Compiling lilypond will likely take between 5 and 60 minutes,
+depending on your computer's speed and available RAM.  We
+recommend that you minimize the terminal window while it is
+building; this can have a non-negligible effect on compilation
+speed.
+
+@example
+cd $LILYPOND_GIT/build/
+make
+@end example
+
+You may run the compiled @code{lilypond} with:
+
+@example
+cd $LILYPOND_GIT/build/
+out/bin/lilypond my-file.ly
+@end example
+
+@subsubheading Building the documentation
+
+Compiling the documentation is a much more involved process, and
+will likely take 2 to 10 hours.
+
+@example
+cd $LILYPOND_GIT/build/
+make
+make doc
+@end example
+
+The documentation is put in @file{out-www/offline-root/}.  You may
+view the html files by entering the below text; we recommend that
+you bookmark the resulting page:
+
+@example
+firefox $LILYPOND_GIT/build/out-www/offline-root/index.html
+@end example
+
+@subsubheading Installing
+
+Don't.  There is no reason to install lilypond within LilyDev.
+All development work can (and should) stay within the
+@file{$LILYPOND_GIT} directory, and any personal composition
+or typesetting work should be done with an official GUB release.
+
+
+@subsubheading Problems and other options
+
+To select different build options, or isolate certain parts of the
+build, or to use multiple CPUs while building, read
+@ref{Compiling}.
+
+In particular, contributors working on the documentation should be
+aware of some bugs in the build system, and should read the
+workarounds in @ref{Generating documentation}.
+
+
+@node Now start work!
+@section Now start work!
+
+LilyDev users may now skip to the chapter which is aimed at
+their intended contributions:
+
+@itemize
+@item @ref{Documentation work}
+@item @ref{Translating the documentation}
+@item @ref{Website work}
+@item @ref{Regression tests}
+@item @ref{Programming work}
+@end itemize
+
+These chapters are mainly intended for people not using LilyDev,
+but they contain extra information about the
+@qq{behind-the-scenes} activities.  We recommend that you read
+these at your leisure, a few weeks after beginning work with
+LilyDev.
+
+@itemize
+@item @ref{Working with source code}
+@item @ref{Compiling}
+@end itemize
+
+
+

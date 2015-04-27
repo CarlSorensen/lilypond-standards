@@ -1,0 +1,271 @@
+/*
+  This file is part of LilyPond, the GNU music typesetter.
+
+  Copyright (C) 2005--2015 Han-Wen Nienhuys <hanwen@xs4all.nl>
+
+  LilyPond is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  LilyPond is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with LilyPond.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "music.hh"
+
+#include "duration.hh"
+#include "program-option.hh"
+#include "warn.hh"
+
+LY_DEFINE (ly_music_length, "ly:music-length",
+           1, 0, 0, (SCM mus),
+           "Get the length of music expression @var{mus} and return"
+           " it as a @code{Moment} object.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+  Music *sc = Music::unsmob (mus);
+  return sc->get_length ().smobbed_copy ();
+}
+
+LY_DEFINE (ly_music_property, "ly:music-property",
+           2, 1, 0, (SCM mus, SCM sym, SCM val),
+           "Return the value for property @var{sym} of music expression"
+           " @var{mus}.  If no value is found, return @var{val} or"
+           " @code{'()} if @var{val} is not specified.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+  return ly_prob_property (mus, sym, val);
+}
+
+LY_DEFINE (ly_music_set_property_x, "ly:music-set-property!",
+           3, 0, 0, (SCM mus, SCM sym, SCM val),
+           "Set property @var{sym} in music expression @var{mus} to"
+           " @var{val}.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+
+  return ly_prob_set_property_x (mus, sym, val);
+}
+
+/* todo:  property args */
+LY_DEFINE (ly_make_music, "ly:make-music",
+           1, 0, 0, (SCM props),
+           "Make a C++ @code{Music} object and initialize it with"
+           " @var{props}.\n"
+           "\n"
+           "This function is for internal use and is only called by"
+           " @code{make-music}, which is the preferred interface"
+           " for creating music objects.")
+{
+  Music *ms = new Music (props);
+  return ms->unprotect ();
+}
+
+LY_DEFINE (ly_music_p, "ly:music?",
+           1, 0, 0, (SCM obj),
+           "Is @var{obj} a music object?")
+{
+  return ly_bool2scm (Music::is_smob (obj));
+}
+
+LY_DEFINE (ly_event_p, "ly:event?",
+           1, 0, 0, (SCM obj),
+           "Is @var{obj} a proper (non-rhythmic) event object?")
+{
+  if (Music *m = Music::unsmob (obj))
+    {
+      return scm_from_bool (m->is_mus_type ("post-event"));
+    }
+  return SCM_BOOL_F;
+}
+
+/* todo: property args */
+LY_DEFINE (ly_music_mutable_properties, "ly:music-mutable-properties",
+           1, 0, 0, (SCM mus),
+           "Return an alist containing the mutable properties of @var{mus}."
+           "  The immutable properties are not available, since they are"
+           " constant and initialized by the @code{make-music} function.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+  Music *m = Music::unsmob (mus);
+  return m->get_property_alist (true);
+}
+
+LY_DEFINE (ly_music_list_p, "ly:music-list?",
+           1, 0, 0, (SCM lst),
+           "Is @var{lst} a list of music objects?")
+{
+  if (!ly_is_list (lst))
+    return SCM_BOOL_F;
+
+  while (scm_is_pair (lst))
+    {
+      if (!Music::is_smob (scm_car (lst)))
+        return SCM_BOOL_F;
+      lst = scm_cdr (lst);
+    }
+
+  return SCM_BOOL_T;
+}
+
+LY_DEFINE (ly_music_deep_copy, "ly:music-deep-copy",
+           1, 0, 0, (SCM m),
+           "Copy @var{m} and all sub expressions of@tie{}@var{m}."
+           " @var{m} may be an arbitrary type; cons cells and music"
+           " are copied recursively.")
+{
+  if (Music::is_smob (m))
+      return Music::unsmob (m)->clone ()->unprotect ();
+  if (scm_is_pair (m))
+    {
+      SCM copy = SCM_EOL;
+      do
+        {
+          copy = scm_cons (ly_music_deep_copy (scm_car (m)), copy);
+          m = scm_cdr (m);
+        }
+      while (scm_is_pair (m));
+      // Oh, come on, GUILE.  Why do you require the second argument
+      // of scm_reverse_x to be a proper list?  That makes no sense.
+      // return scm_reverse_x (copy, ly_music_deep_copy (m));
+      SCM last_cons = copy;
+      copy = scm_reverse_x (copy, SCM_EOL);
+      scm_set_cdr_x (last_cons, ly_music_deep_copy (m));
+      return copy;
+    }
+  return m;
+}
+
+LY_DEFINE (ly_music_transpose, "ly:music-transpose",
+           2, 0, 0, (SCM m, SCM p),
+           "Transpose @var{m} such that central@tie{}C is mapped"
+           " to@tie{}@var{p}.  Return@tie{}@var{m}.")
+{
+  LY_ASSERT_SMOB (Music, m, 1);
+  LY_ASSERT_SMOB (Pitch, p, 2);
+
+  Music *sc = Music::unsmob (m);
+  Pitch *sp = Pitch::unsmob (p);
+
+  sc->transpose (*sp);
+  // SCM_UNDEFINED ?
+  return sc->self_scm ();
+}
+
+/*
+  TODO: should take moment factor?
+*/
+LY_DEFINE (ly_music_compress, "ly:music-compress",
+           2, 0, 0, (SCM m, SCM factor),
+           "Compress music object@tie{}@var{m} by moment @var{factor}.")
+{
+  LY_ASSERT_SMOB (Music, m, 1);
+  LY_ASSERT_SMOB (Moment, factor, 2);
+
+  Music *sc = Music::unsmob (m);
+  sc->compress (*Moment::unsmob (factor));
+  return sc->self_scm ();
+}
+
+LY_DEFINE (ly_make_music_relative_x, "ly:make-music-relative!",
+           2, 0, 0, (SCM music, SCM pitch),
+           "Make @var{music} relative to @var{pitch},"
+           " return final pitch.")
+{
+  LY_ASSERT_SMOB (Music, music, 1);
+  LY_ASSERT_SMOB (Pitch, pitch, 2);
+
+  Pitch start = *Pitch::unsmob (pitch);
+  Music *m = Music::unsmob (music);
+  Pitch last = m->to_relative_octave (start);
+
+  return last.smobbed_copy ();
+}
+
+LY_DEFINE (ly_music_duration_length, "ly:music-duration-length", 1, 0, 0,
+           (SCM mus),
+           "Extract the duration field from @var{mus} and return the"
+           " length.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+  Music *m = Music::unsmob (mus);
+
+  Duration *d = Duration::unsmob (m->get_property ("duration"));
+  Moment len;
+
+  if (d)
+    len = d->get_length ();
+  else
+    programming_error ("music has no duration");
+  return len.smobbed_copy ();
+}
+
+LY_DEFINE (ly_music_duration_compress, "ly:music-duration-compress", 2, 0, 0,
+           (SCM mus, SCM fact),
+           "Compress @var{mus} by factor @var{fact}, which is a"
+           " @code{Moment}.")
+{
+  LY_ASSERT_SMOB (Music, mus, 1);
+  LY_ASSERT_SMOB (Moment, fact, 2);
+
+  Music *m = Music::unsmob (mus);
+  Moment *f = Moment::unsmob (fact);
+
+  Duration *d = Duration::unsmob (m->get_property ("duration"));
+  if (d)
+    m->set_property ("duration", d->compressed (f->main_part_).smobbed_copy ());
+  return SCM_UNSPECIFIED;
+}
+
+/*
+  This is hairy, since the scale in a key-change event may contain
+  octaveless notes.
+
+
+  TODO: this should use ly:pitch.
+*/
+LY_DEFINE (ly_transpose_key_alist, "ly:transpose-key-alist",
+           2, 0, 0, (SCM l, SCM pit),
+           "Make a new key alist of@tie{}@var{l} transposed by"
+           " pitch @var{pit}.")
+{
+  SCM newlist = SCM_EOL;
+  Pitch *p = Pitch::unsmob (pit);
+
+  for (SCM s = l; scm_is_pair (s); s = scm_cdr (s))
+    {
+      SCM key = scm_caar (s);
+      SCM alter = scm_cdar (s);
+      if (scm_is_pair (key))
+        {
+          Pitch orig (scm_to_int (scm_car (key)),
+                      scm_to_int (scm_cdr (key)),
+                      ly_scm2rational (alter));
+
+          orig = orig.transposed (*p);
+
+          SCM key = scm_cons (scm_from_int (orig.get_octave ()),
+                              scm_from_int (orig.get_notename ()));
+
+          newlist = scm_cons (scm_cons (key, ly_rational2scm (orig.get_alteration ())),
+                              newlist);
+        }
+      else if (scm_is_number (key))
+        {
+          Pitch orig (0, scm_to_int (key), ly_scm2rational (alter));
+          orig = orig.transposed (*p);
+
+          key = scm_from_int (orig.get_notename ());
+          alter = ly_rational2scm (orig.get_alteration ());
+          newlist = scm_cons (scm_cons (key, alter), newlist);
+        }
+    }
+  return scm_reverse_x (newlist, SCM_EOL);
+}
+

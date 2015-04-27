@@ -1,0 +1,7 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Invece di destinare un rigo a parte alla linea melodica e al suo testo, è
+possibile collocare il testo al centro di un doppio pentagramma per pianoforte.
+
+"
+  doctitleit = "Modello per pianoforte con testo al centro"

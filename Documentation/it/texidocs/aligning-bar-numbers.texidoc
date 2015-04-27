@@ -1,0 +1,10 @@
+%% Translation of GIT committish: 3c907f2dd5ba3dd91e30454922d8361225ca28d5
+  texidocit = "
+Per impostazione predefinita i numeri di battuta sono allineati a destra rispetto
+al loro oggetto genitore. Di solito si tratta del margine sinistro della linea
+oppure, se i numeri appaiono all'interno della linea, del lato sinistro della
+stanghetta.  I numeri possono essere posizionati anche direttamente sopra la
+stanghetta oppure allineati a sinistra della stanghetta.
+
+"
+  doctitleit = "Allineare i numeri di battuta"
